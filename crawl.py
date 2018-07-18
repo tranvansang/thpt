@@ -19,13 +19,16 @@ pref_end = 63
 sbd_id_start = 0
 sbd_id_end = 99999
 last_fail_pref = 1
-last_fail_sbd_id = 1268
+last_fail_sbd_id = 3349
 
 # verbose each 10 students
 verbose_range = 10
 
 # if there no data in 100 consecutive students -> quit that pref
 stop_threshold = 100
+
+flush_freq = 50
+ctrl_c_interupted = [False]
 
 user_agents = [
         "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
@@ -77,7 +80,8 @@ subjects = {
         'sinh-hoc': 7,
         'vat-li': 8,
         'khtn': 9,
-        'hoa-hoc': 10
+        'hoa-hoc': 10,
+        'tieng-trung': 11
         }
 
 def force_set(lst, idx, val):
@@ -97,6 +101,8 @@ def write_student(pref, sbd_id, student):
             print("new subject has been added", subjects)
         force_set(row, index + 2, score)
     csvwriter.writerow(row)
+    if sbd_id % flush_freq == 0:
+        csvfile.flush()
 
 def crawl_and_write(pref, sbd_id):
     sbd = "%02d0%05d" % (pref, sbd_id)
@@ -120,6 +126,8 @@ def scan_all(pref_start, pref_end, sbd_id_start, sbd_id_end, last_fail_pref, las
             if (sbd_id % verbose_range == 0):
                 print("crawling student (%d, %d) (cnt = %d)" % (pref, sbd_id, cnt))
             while retry < max_retry:
+                if ctrl_c_interupted[0]:
+                    return
                 try:
                     if crawl_and_write(pref, sbd_id):
                         cnt += 1
@@ -143,11 +151,12 @@ def write_subjects():
         force_set(row, index + 2, subject)
     csvwriter.writerow(row)
 def signal_handler(sign, frame):
+    ctrl_c_interupted[0] = True
     print("you pressed Ctrl-C!")
-    write_subjects()
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
 scan_all(pref_start, pref_end, sbd_id_start, sbd_id_end, last_fail_pref, last_fail_sbd_id)
 
 write_subjects()
+csvfile.flush()

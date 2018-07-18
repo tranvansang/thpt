@@ -13,6 +13,7 @@ Crawl CSDL thi THPC quốc gia năm 2018 từ Zing.vn
 - Run `python crawl.py`
 - Output is written in `out.csv`
 - Check more configuration in `crawl.py`
+- Press `Ctrl-C` once (do NOT press twice or more) to terminate job. Crawled data is not lost and saved in `out.csv`
 
 # Student ID structure
 
