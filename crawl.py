@@ -19,7 +19,7 @@ pref_end = 63
 sbd_id_start = 0
 sbd_id_end = 99999
 last_fail_pref = 1
-last_fail_sbd_id = 3349
+last_fail_sbd_id = 3638
 
 # verbose each 10 students
 verbose_range = 10
@@ -154,6 +154,8 @@ def write_subjects():
 def signal_handler(sign, frame):
     ctrl_c_interupted[0] = True
     print("you pressed Ctrl-C!")
+    write_subjects()
+    csvfile.flush()
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
