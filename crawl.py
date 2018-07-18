@@ -15,7 +15,12 @@ sbd_id_start = 0
 sbd_id_end = 99999
 last_fail_pref = 1
 last_fail_sbd_id = 499
+
+# verbose each 10 students
 verbose_range = 10
+
+# if there no data in 100 consecutive students -> quit that pref
+stop_threshold = 100
 
 #sbd: string
 def crawl(sbd):
@@ -76,6 +81,7 @@ def crawl_and_write(pref, sbd_id):
 def scan_all(pref_start, pref_end, sbd_id_start, sbd_id_end, last_fail_pref, last_fail_sbd_id):
     for pref in range(max(pref_start, last_fail_pref), pref_end + 1):
         cnt = 0
+        notfound_cnt = 0
         if pref == last_fail_pref:
             start_index = max(last_fail_sbd_id, sbd_id_start)
         else:
@@ -89,11 +95,16 @@ def scan_all(pref_start, pref_end, sbd_id_start, sbd_id_end, last_fail_pref, las
                 try:
                     if crawl_and_write(pref, sbd_id):
                         cnt += 1
+                        notfound_cnt = 0
+                    else:
+                        notfound_cnt += 1
                     retry = max_retry
                 except:
                     retry += 1
                     time.sleep(retry_interval)
                     print("Crawling student (%d, %d) failed, retry %d" %(pref, sbd_id, retry))
+            if notfound_cnt >= stop-stop_threshold:
+                break
             time.sleep(time_interval)
         if cnt == 0:
             print("No student data in pref code %d" % pref)
