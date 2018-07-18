@@ -81,7 +81,8 @@ subjects = {
         'vat-li': 8,
         'khtn': 9,
         'hoa-hoc': 10,
-        'tieng-trung': 11
+        'tieng-trung': 11,
+        'tieng-nhat': 12
         }
 
 def force_set(lst, idx, val):
